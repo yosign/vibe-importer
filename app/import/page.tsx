@@ -99,7 +99,7 @@ export default function ImportPage() {
               </div>
             ) : folders.length === 0 ? (
               <div className="rounded-2xl border border-dashed p-8 text-sm text-muted-foreground">
-                No scanned folders yet. Click "Scan imports folder" to start.
+                No scanned folders yet. Click &quot;Scan imports folder&quot; to start.
               </div>
             ) : (
               folders.map((folder) => (
