@@ -2,37 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: 0 0% 3.9%;
-  --foreground: 0 0% 92%;
-  --card: 0 0% 7%;
-  --card-foreground: 0 0% 92%;
-  --popover: 0 0% 7%;
-  --popover-foreground: 0 0% 92%;
-  --primary: 160 84% 39%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 12%;
-  --secondary-foreground: 0 0% 70%;
-  --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 50%;
-  --accent: 0 0% 12%;
-  --accent-foreground: 0 0% 92%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 14%;
-  --input: 0 0% 14%;
-  --ring: 160 84% 39%;
-  --radius: 0.5rem;
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+
+@layer base {
+  * { @apply border-zinc-800; }
+  body {
+    @apply bg-zinc-950 text-zinc-100;
+    font-family: 'Geist', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  input, textarea, select {
+    @apply bg-zinc-900 border-zinc-700 text-zinc-100;
+  }
+  input:focus, textarea:focus, select:focus {
+    @apply border-emerald-500 outline-none ring-0;
+  }
 }
 
-* {
-  @apply border-border;
-}
-
-body {
-  @apply min-h-screen bg-zinc-950 text-zinc-100 antialiased;
-}
-
-a {
-  @apply transition-colors;
+@layer utilities {
+  .mono { font-family: 'Geist Mono', monospace; }
+  .tabular { font-variant-numeric: tabular-nums; }
 }

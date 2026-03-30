@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Download, PackageSearch, Upload } from "lucide-react";
+import { PackageSearch, Upload } from "lucide-react";
 import { CsvExportButton } from "@/components/CsvExportButton";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductTable, type ProductRow } from "@/components/ProductTable";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 type ProductsResponse = {
@@ -66,6 +67,7 @@ export default function ProductsPage() {
   }
 
   const readyCount = products.filter((product) => product.status === "ready").length;
+  const pendingCount = products.filter((product) => product.status === "pending").length;
 
   const tabs = [
     { value: "all", label: "All" },
@@ -80,8 +82,8 @@ export default function ProductsPage() {
         {/* Page header */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Products</h1>
-            <p className="mt-1 text-sm text-zinc-400">Manage and export your Shopify products</p>
+            <h1 className="text-[28px] font-semibold tracking-tight text-zinc-100">Products</h1>
+            <p className="mt-1 text-[13px] text-zinc-400">Manage and export Shopify products</p>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -92,7 +94,7 @@ export default function ProductsPage() {
               )}
             >
               <Upload className="mr-2 h-4 w-4" />
-              Import Products
+              Import
             </Link>
             <CsvExportButton
               productIds={selectedIds}
@@ -105,15 +107,14 @@ export default function ProductsPage() {
         {/* Stats row */}
         <div className="grid gap-4 md:grid-cols-3">
           <ProductCard label="Total Products" value={products.length} />
-          <ProductCard label="Ready to Export" value={readyCount} accent />
-          <ProductCard label="Selected" value={selectedIds.length} />
+          <ProductCard label="Ready to Export" value={readyCount} tone="emerald" />
+          <ProductCard label="Pending" value={pendingCount} tone="amber" />
         </div>
 
         {/* Product table card */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900">
-          {/* Toolbar */}
-          <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
-            <h2 className="text-sm font-medium text-zinc-100">Product List</h2>
+        <Card className="rounded-xl border border-zinc-800 bg-zinc-900">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-800 px-6 py-4">
+            <h2 className="text-[13px] font-medium text-zinc-100">Product List</h2>
             {/* Filter tabs */}
             <div className="flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-950 p-1">
               {tabs.map((tab) => (
@@ -122,7 +123,7 @@ export default function ProductsPage() {
                   type="button"
                   onClick={() => setStatusFilter(tab.value)}
                   className={cn(
-                    "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+                    "rounded-md px-3 py-1 text-[13px] font-medium transition-colors",
                     statusFilter === tab.value
                       ? "bg-zinc-700 text-zinc-100"
                       : "text-zinc-500 hover:text-zinc-300"
@@ -132,10 +133,9 @@ export default function ProductsPage() {
                 </button>
               ))}
             </div>
-          </div>
+          </CardHeader>
 
-          {/* Content */}
-          <div className="p-6">
+          <CardContent className="p-6">
             {loading ? (
               <div className="flex items-center gap-3 rounded-lg border border-dashed border-zinc-700 p-8 text-zinc-500">
                 <PackageSearch className="h-5 w-5" />
@@ -143,7 +143,7 @@ export default function ProductsPage() {
               </div>
             ) : filteredProducts.length === 0 ? (
               <div className="flex items-center gap-3 rounded-lg border border-dashed border-zinc-700 p-8 text-zinc-500">
-                <Download className="h-5 w-5" />
+                <PackageSearch className="h-5 w-5" />
                 No products found for the current filter.
               </div>
             ) : (
@@ -154,8 +154,8 @@ export default function ProductsPage() {
                 onDelete={handleDelete}
               />
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </main>
   );

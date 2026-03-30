@@ -56,12 +56,16 @@ export function CsvExportButton({
       disabled={isDisabled}
       className={
         isDisabled
-          ? "bg-zinc-800 text-zinc-600 hover:bg-zinc-800"
+          ? "cursor-not-allowed bg-zinc-800 text-zinc-600 hover:bg-zinc-800"
           : "bg-emerald-600 text-white hover:bg-emerald-500"
       }
     >
       <Download className="mr-2 h-4 w-4" />
-      {loading ? "Exporting..." : "Export CSV"}
+      {loading
+        ? "Exporting..."
+        : productIds.length > 0
+          ? `Export CSV (${productIds.length})`
+          : "Export CSV"}
     </Button>
   );
 }

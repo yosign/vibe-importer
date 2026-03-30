@@ -78,58 +78,67 @@ export function ImageEditor({
   return (
     <div className="space-y-3">
       {orderedImages.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-zinc-700 p-6 text-sm text-zinc-500">
+        <div className="rounded-lg border border-dashed border-zinc-700 p-6 text-[13px] text-zinc-500">
           No images found in this product folder.
         </div>
       ) : null}
+
       {orderedImages.map((image, index) => (
         <div
           key={image.id}
-          className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+          className="rounded-lg border border-zinc-800 bg-zinc-950 p-3"
         >
-          <div className="flex items-center gap-3 min-w-0">
+          {/* Image preview */}
+          <button
+            type="button"
+            onClick={() => setPreviewImage(image)}
+            className="mb-3 block w-full overflow-hidden rounded-lg"
+          >
             <img
               src={`/api/images?imagePath=${encodeURIComponent(image.local_path)}`}
               alt={image.filename}
-              className="h-12 w-12 flex-shrink-0 rounded-lg object-cover"
+              className="max-h-48 w-full rounded-lg object-cover"
             />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-zinc-100">{image.filename}</p>
-              <button
-                type="button"
-                className="text-xs text-zinc-500 underline-offset-4 hover:text-zinc-300 hover:underline"
-                onClick={() => setPreviewImage(image)}
-              >
-                Preview
-              </button>
+          </button>
+
+          {/* Controls row */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="flex gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => moveImage(index, -1)}
+                  className="h-7 w-7 border border-zinc-700 bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100"
+                >
+                  <ArrowUp className="h-3 w-3" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => moveImage(index, 1)}
+                  className="h-7 w-7 border border-zinc-700 bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100"
+                >
+                  <ArrowDown className="h-3 w-3" />
+                </Button>
+              </div>
+              <span className="mono truncate text-[12px] text-zinc-400">{image.filename}</span>
+              {image.processed && (
+                <span className="flex-shrink-0 mono rounded-full border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-emerald-400">
+                  processed
+                </span>
+              )}
             </div>
-          </div>
-          <div className="ml-3 flex flex-shrink-0 items-center gap-1.5">
             <Button
               type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => moveImage(index, -1)}
-              className="h-8 w-8 border border-zinc-700 bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100"
-            >
-              <ArrowUp className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => moveImage(index, 1)}
-              className="h-8 w-8 border border-zinc-700 bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100"
-            >
-              <ArrowDown className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              type="button"
+              variant="outline"
               size="sm"
               onClick={() => optimizeImage(image)}
-              className="bg-emerald-600 text-white hover:bg-emerald-500"
+              className="flex-shrink-0 border-emerald-700 bg-transparent text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
             >
-              <WandSparkles className="mr-1.5 h-3.5 w-3.5" />
+              <WandSparkles className="mr-1.5 h-3 w-3" />
               Process
             </Button>
           </div>
@@ -149,7 +158,9 @@ export function ImageEditor({
               className="max-h-[60vh] w-full rounded-lg object-contain"
             />
           ) : null}
-          <div className="break-all rounded-lg bg-zinc-950 p-3 text-xs text-zinc-400">{previewImage?.local_path}</div>
+          <div className="mono break-all rounded-lg bg-zinc-950 p-3 text-xs text-zinc-400">
+            {previewImage?.local_path}
+          </div>
           <DialogFooter>
             <Button
               type="button"

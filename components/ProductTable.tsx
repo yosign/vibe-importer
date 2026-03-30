@@ -1,8 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Edit2, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
 export type ProductRow = {
@@ -19,15 +27,15 @@ export type ProductRow = {
 
 function StatusBadge({ status }: { status: ProductRow["status"] }) {
   const styles = {
-    pending: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-    ready: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    exported: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+    pending: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
+    ready: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+    exported: "bg-zinc-700/50 text-zinc-500 border border-zinc-700"
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+        "mono inline-flex items-center rounded-full px-2 py-0.5 text-[11px] uppercase tracking-wide",
         styles[status]
       )}
     >
@@ -59,10 +67,10 @@ export function ProductTable({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-zinc-800">
-            <th className="w-10 pb-3 pr-3 text-left">
+      <Table>
+        <TableHeader>
+          <TableRow className="border-b border-zinc-800 hover:bg-transparent">
+            <TableHead className="w-10">
               <input
                 type="checkbox"
                 checked={allSelected}
@@ -71,80 +79,87 @@ export function ProductTable({
                 }
                 className="accent-emerald-500"
               />
-            </th>
-            <th className="w-12 pb-3 pr-4 text-left"></th>
-            <th className="pb-3 pr-4 text-left font-medium text-zinc-400">Title</th>
-            <th className="pb-3 pr-4 text-left font-medium text-zinc-400">Type</th>
-            <th className="pb-3 pr-4 text-left font-medium text-zinc-400">Variants</th>
-            <th className="pb-3 pr-4 text-left font-medium text-zinc-400">Status</th>
-            <th className="pb-3 pr-4 text-left font-medium text-zinc-400">Created</th>
-            <th className="pb-3 text-right font-medium text-zinc-400">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-zinc-800/50">
+            </TableHead>
+            <TableHead className="w-12" />
+            <TableHead className="text-[12px] uppercase tracking-wider text-zinc-400 font-medium">Title</TableHead>
+            <TableHead className="text-[12px] uppercase tracking-wider text-zinc-400 font-medium">Type</TableHead>
+            <TableHead className="text-[12px] uppercase tracking-wider text-zinc-400 font-medium">Variants</TableHead>
+            <TableHead className="text-[12px] uppercase tracking-wider text-zinc-400 font-medium">Status</TableHead>
+            <TableHead className="text-[12px] uppercase tracking-wider text-zinc-400 font-medium">Created</TableHead>
+            <TableHead className="text-right text-[12px] uppercase tracking-wider text-zinc-400 font-medium">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {products.map((product) => (
-            <tr key={product.id} className="group transition-colors hover:bg-zinc-800/40">
-              <td className="py-3 pr-3">
+            <TableRow
+              key={product.id}
+              className="border-b border-zinc-800/50 transition-colors hover:bg-zinc-800/30"
+            >
+              <TableCell>
                 <input
                   type="checkbox"
                   checked={selectedIds.includes(product.id)}
                   onChange={() => toggleProduct(product.id)}
                   className="accent-emerald-500"
                 />
-              </td>
-              <td className="py-3 pr-4">
+              </TableCell>
+              <TableCell>
                 {product.firstImage ? (
                   <img
                     src={`/api/images?imagePath=${encodeURIComponent(product.firstImage)}`}
                     alt={product.title}
-                    className="h-10 w-10 rounded-lg object-cover"
+                    className="h-9 w-9 rounded-md object-cover bg-zinc-800"
                   />
                 ) : (
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800 text-xs text-zinc-600">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-md bg-zinc-800 text-xs text-zinc-600">
                     —
                   </div>
                 )}
-              </td>
-              <td className="py-3 pr-4">
-                <p className="font-medium text-zinc-100">{product.title}</p>
+              </TableCell>
+              <TableCell>
+                <p className="text-[14px] font-medium text-zinc-100">{product.title}</p>
                 {product.vendor && (
-                  <p className="text-xs text-zinc-500">{product.vendor}</p>
+                  <p className="text-[12px] text-zinc-500">{product.vendor}</p>
                 )}
-              </td>
-              <td className="py-3 pr-4 text-zinc-400">{product.type || <span className="text-zinc-700">—</span>}</td>
-              <td className="py-3 pr-4 text-zinc-400">{product.variantCount}</td>
-              <td className="py-3 pr-4">
+              </TableCell>
+              <TableCell className="text-[13px] text-zinc-400">
+                {product.type || <span className="text-zinc-700">—</span>}
+              </TableCell>
+              <TableCell className="mono tabular text-[13px] text-zinc-400">
+                {product.variantCount}
+              </TableCell>
+              <TableCell>
                 <StatusBadge status={product.status} />
-              </td>
-              <td className="py-3 pr-4 text-zinc-500">
+              </TableCell>
+              <TableCell className="mono text-[12px] text-zinc-500">
                 {new Date(product.created_at).toLocaleDateString("en-US")}
-              </td>
-              <td className="py-3">
-                <div className="flex items-center justify-end gap-2">
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center justify-end gap-1">
                   <Link
                     href={`/products/${product.id}`}
                     className={cn(
                       buttonVariants({ variant: "ghost", size: "sm" }),
-                      "h-8 w-8 p-0 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100"
+                      "h-8 w-8 p-0 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-300"
                     )}
                   >
-                    <Edit2 className="h-3.5 w-3.5" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Link>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     onClick={() => onDelete(product.id)}
-                    className="h-8 w-8 p-0 text-zinc-600 hover:bg-red-500/10 hover:text-red-400"
+                    className="h-8 w-8 p-0 text-zinc-600 hover:bg-rose-500/10 hover:text-rose-400"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
