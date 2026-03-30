@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { ImageEditor, type EditableImage } from "@/components/ImageEditor";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -112,8 +111,8 @@ export default function ProductEditPage() {
 
   if (loading || !product) {
     return (
-      <main className="min-h-screen px-4 py-10 md:px-8">
-        <div className="mx-auto max-w-6xl rounded-[2rem] border border-dashed bg-white/70 p-10 text-muted-foreground">
+      <main className="px-6 py-8">
+        <div className="mx-auto max-w-6xl rounded-xl border border-dashed border-zinc-700 p-10 text-zinc-500">
           Loading product...
         </div>
       </main>
@@ -121,47 +120,83 @@ export default function ProductEditPage() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-10 md:px-8">
+    <main className="px-6 py-8">
       <div className="mx-auto max-w-6xl space-y-6">
+        {/* Page header */}
         <div className="flex items-center justify-between">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Products
-          </Link>
-          <Button onClick={handleSave} disabled={saving}>
-            <Save className="mr-2 h-4 w-4" />
-            {saving ? "Saving..." : "Save"}
+          <div>
+            <Link
+              href="/"
+              className="mb-2 inline-flex items-center gap-1.5 text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Products
+            </Link>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">{product.title}</h1>
+          </div>
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-emerald-600 text-white hover:bg-emerald-500"
+          >
+            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            {saving ? "Saving..." : "Save Changes"}
           </Button>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <Card className="border-white/70 bg-white/90">
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
+        {/* Two-column layout */}
+        <div className="grid gap-6 lg:grid-cols-[3fr_2fr]">
+          {/* Left: Basic Info */}
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+            <h2 className="mb-5 text-sm font-medium text-zinc-100">Basic Info</h2>
+            <div className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
-                <Input id="title" value={product.title} onChange={(e) => updateField("title", e.target.value)} />
+                <Label htmlFor="title" className="text-xs text-zinc-400">Title</Label>
+                <Input
+                  id="title"
+                  value={product.title}
+                  onChange={(e) => updateField("title", e.target.value)}
+                  className="border-zinc-700 bg-zinc-950 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-emerald-500"
+                />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="vendor">Vendor</Label>
-                  <Input id="vendor" value={product.vendor ?? ""} onChange={(e) => updateField("vendor", e.target.value)} />
+                  <Label htmlFor="vendor" className="text-xs text-zinc-400">Vendor</Label>
+                  <Input
+                    id="vendor"
+                    value={product.vendor ?? ""}
+                    onChange={(e) => updateField("vendor", e.target.value)}
+                    className="border-zinc-700 bg-zinc-950 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-emerald-500"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="type">Type</Label>
-                  <Input id="type" value={product.type ?? ""} onChange={(e) => updateField("type", e.target.value)} />
+                  <Label htmlFor="type" className="text-xs text-zinc-400">Type</Label>
+                  <Input
+                    id="type"
+                    value={product.type ?? ""}
+                    onChange={(e) => updateField("type", e.target.value)}
+                    className="border-zinc-700 bg-zinc-950 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-emerald-500"
+                  />
                 </div>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="tags">Tags</Label>
-                  <Input id="tags" value={product.tags ?? ""} onChange={(e) => updateField("tags", e.target.value)} />
+                  <Label htmlFor="tags" className="text-xs text-zinc-400">Tags</Label>
+                  <Input
+                    id="tags"
+                    value={product.tags ?? ""}
+                    onChange={(e) => updateField("tags", e.target.value)}
+                    className="border-zinc-700 bg-zinc-950 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-emerald-500"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select id="status" value={product.status} onChange={(e) => updateField("status", e.target.value as ProductDetail["status"])}>
+                  <Label htmlFor="status" className="text-xs text-zinc-400">Status</Label>
+                  <Select
+                    id="status"
+                    value={product.status}
+                    onChange={(e) => updateField("status", e.target.value as ProductDetail["status"])}
+                    className="border-zinc-700 bg-zinc-950 text-zinc-100 focus-visible:ring-emerald-500"
+                  >
                     <option value="pending">pending</option>
                     <option value="ready">ready</option>
                     <option value="exported">exported</option>
@@ -169,41 +204,42 @@ export default function ProductEditPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="option_name">Option Name</Label>
-                <Input id="option_name" value={product.option_name ?? "Color"} onChange={(e) => updateField("option_name", e.target.value)} />
+                <Label htmlFor="option_name" className="text-xs text-zinc-400">Option Name</Label>
+                <Input
+                  id="option_name"
+                  value={product.option_name ?? "Color"}
+                  onChange={(e) => updateField("option_name", e.target.value)}
+                  className="border-zinc-700 bg-zinc-950 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-emerald-500"
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="body_html">Description</Label>
+                <Label htmlFor="body_html" className="text-xs text-zinc-400">Description</Label>
                 <textarea
                   id="body_html"
-                  className="min-h-40 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  className="min-h-40 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   value={product.body_html ?? ""}
                   onChange={(e) => updateField("body_html", e.target.value)}
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="border-white/70 bg-white/90">
-            <CardHeader>
-              <CardTitle>Images</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ImageEditor images={product.images} onChange={(images) => updateField("images", images)} />
-            </CardContent>
-          </Card>
+          {/* Right: Images */}
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+            <h2 className="mb-5 text-sm font-medium text-zinc-100">Images</h2>
+            <ImageEditor images={product.images} onChange={(images) => updateField("images", images)} />
+          </div>
         </div>
 
-        <Card className="border-white/70 bg-white/90">
-          <CardHeader>
-            <CardTitle>Variants</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        {/* Variants */}
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
+          <h2 className="mb-5 text-sm font-medium text-zinc-100">Variants</h2>
+          <div className="space-y-3">
             {product.variants.map((variant, index) => (
-              <div key={`${variant.id ?? "new"}-${index}`} className="space-y-4 rounded-2xl border p-4">
+              <div key={`${variant.id ?? "new"}-${index}`} className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">
                 <div className="grid gap-4 md:grid-cols-4">
                   <div className="space-y-2">
-                    <Label>Option Value</Label>
+                    <Label className="text-xs text-zinc-400">Option Value</Label>
                     <Input
                       value={variant.option_value}
                       onChange={(e) => {
@@ -211,10 +247,11 @@ export default function ProductEditPage() {
                         next[index] = { ...variant, option_value: e.target.value };
                         updateField("variants", next);
                       }}
+                      className="border-zinc-700 bg-zinc-900 text-zinc-100 focus-visible:ring-emerald-500"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>SKU</Label>
+                    <Label className="text-xs text-zinc-400">SKU</Label>
                     <Input
                       value={variant.sku}
                       onChange={(e) => {
@@ -222,10 +259,11 @@ export default function ProductEditPage() {
                         next[index] = { ...variant, sku: e.target.value };
                         updateField("variants", next);
                       }}
+                      className="border-zinc-700 bg-zinc-900 text-zinc-100 focus-visible:ring-emerald-500"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Price</Label>
+                    <Label className="text-xs text-zinc-400">Price</Label>
                     <Input
                       value={variant.price}
                       onChange={(e) => {
@@ -233,10 +271,11 @@ export default function ProductEditPage() {
                         next[index] = { ...variant, price: e.target.value };
                         updateField("variants", next);
                       }}
+                      className="border-zinc-700 bg-zinc-900 text-zinc-100 focus-visible:ring-emerald-500"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Inventory</Label>
+                    <Label className="text-xs text-zinc-400">Inventory</Label>
                     <Input
                       type="number"
                       value={variant.inventory_qty}
@@ -245,26 +284,28 @@ export default function ProductEditPage() {
                         next[index] = { ...variant, inventory_qty: Number.parseInt(e.target.value, 10) || 0 };
                         updateField("variants", next);
                       }}
+                      className="border-zinc-700 bg-zinc-900 text-zinc-100 focus-visible:ring-emerald-500"
                     />
                   </div>
                 </div>
               </div>
             ))}
-            <Separator />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() =>
-                updateField("variants", [
-                  ...product.variants,
-                  { option_value: "New Option", sku: "", price: "0.00", inventory_qty: 0 }
-                ])
-              }
-            >
-              Add Variant
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+          <Separator className="my-4 bg-zinc-800" />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              updateField("variants", [
+                ...product.variants,
+                { option_value: "New Option", sku: "", price: "0.00", inventory_qty: 0 }
+              ])
+            }
+            className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+          >
+            Add Variant
+          </Button>
+        </div>
       </div>
     </main>
   );

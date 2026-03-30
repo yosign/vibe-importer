@@ -1,17 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Edit2, Trash2 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
 export type ProductRow = {
@@ -26,10 +17,23 @@ export type ProductRow = {
   firstImage: string | null;
 };
 
-function statusVariant(status: ProductRow["status"]) {
-  if (status === "ready") return "secondary";
-  if (status === "exported") return "outline";
-  return "default";
+function StatusBadge({ status }: { status: ProductRow["status"] }) {
+  const styles = {
+    pending: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+    ready: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    exported: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+  };
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+        styles[status]
+      )}
+    >
+      {status}
+    </span>
+  );
 }
 
 export function ProductTable({
@@ -54,76 +58,93 @@ export function ProductTable({
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-12">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={(event) =>
-                onSelectedIdsChange(event.target.checked ? products.map((product) => product.id) : [])
-              }
-            />
-          </TableHead>
-          <TableHead>缩略图</TableHead>
-          <TableHead>标题</TableHead>
-          <TableHead>供应商</TableHead>
-          <TableHead>类型</TableHead>
-          <TableHead>变体数</TableHead>
-          <TableHead>状态</TableHead>
-          <TableHead>创建时间</TableHead>
-          <TableHead className="text-right">操作</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {products.map((product) => (
-          <TableRow key={product.id}>
-            <TableCell>
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-zinc-800">
+            <th className="w-10 pb-3 pr-3 text-left">
               <input
                 type="checkbox"
-                checked={selectedIds.includes(product.id)}
-                onChange={() => toggleProduct(product.id)}
+                checked={allSelected}
+                onChange={(event) =>
+                  onSelectedIdsChange(event.target.checked ? products.map((product) => product.id) : [])
+                }
+                className="accent-emerald-500"
               />
-            </TableCell>
-            <TableCell>
-              {product.firstImage ? (
-                <img
-                  src={`/api/images?imagePath=${encodeURIComponent(product.firstImage)}`}
-                  alt={product.title}
-                  className="h-12 w-12 rounded-xl object-cover"
+            </th>
+            <th className="w-12 pb-3 pr-4 text-left"></th>
+            <th className="pb-3 pr-4 text-left font-medium text-zinc-400">Title</th>
+            <th className="pb-3 pr-4 text-left font-medium text-zinc-400">Type</th>
+            <th className="pb-3 pr-4 text-left font-medium text-zinc-400">Variants</th>
+            <th className="pb-3 pr-4 text-left font-medium text-zinc-400">Status</th>
+            <th className="pb-3 pr-4 text-left font-medium text-zinc-400">Created</th>
+            <th className="pb-3 text-right font-medium text-zinc-400">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-zinc-800/50">
+          {products.map((product) => (
+            <tr key={product.id} className="group transition-colors hover:bg-zinc-800/40">
+              <td className="py-3 pr-3">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.includes(product.id)}
+                  onChange={() => toggleProduct(product.id)}
+                  className="accent-emerald-500"
                 />
-              ) : (
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-xs text-muted-foreground">
-                  N/A
+              </td>
+              <td className="py-3 pr-4">
+                {product.firstImage ? (
+                  <img
+                    src={`/api/images?imagePath=${encodeURIComponent(product.firstImage)}`}
+                    alt={product.title}
+                    className="h-10 w-10 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800 text-xs text-zinc-600">
+                    —
+                  </div>
+                )}
+              </td>
+              <td className="py-3 pr-4">
+                <p className="font-medium text-zinc-100">{product.title}</p>
+                {product.vendor && (
+                  <p className="text-xs text-zinc-500">{product.vendor}</p>
+                )}
+              </td>
+              <td className="py-3 pr-4 text-zinc-400">{product.type || <span className="text-zinc-700">—</span>}</td>
+              <td className="py-3 pr-4 text-zinc-400">{product.variantCount}</td>
+              <td className="py-3 pr-4">
+                <StatusBadge status={product.status} />
+              </td>
+              <td className="py-3 pr-4 text-zinc-500">
+                {new Date(product.created_at).toLocaleDateString("en-US")}
+              </td>
+              <td className="py-3">
+                <div className="flex items-center justify-end gap-2">
+                  <Link
+                    href={`/products/${product.id}`}
+                    className={cn(
+                      buttonVariants({ variant: "ghost", size: "sm" }),
+                      "h-8 w-8 p-0 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100"
+                    )}
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
+                  </Link>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDelete(product.id)}
+                    className="h-8 w-8 p-0 text-zinc-600 hover:bg-red-500/10 hover:text-red-400"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
-              )}
-            </TableCell>
-            <TableCell className="font-medium">{product.title}</TableCell>
-            <TableCell>{product.vendor || "-"}</TableCell>
-            <TableCell>{product.type || "-"}</TableCell>
-            <TableCell>{product.variantCount}</TableCell>
-            <TableCell>
-              <Badge variant={statusVariant(product.status)}>{product.status}</Badge>
-            </TableCell>
-            <TableCell>{new Date(product.created_at).toLocaleString("zh-CN")}</TableCell>
-            <TableCell>
-              <div className="flex justify-end gap-2">
-                <Link
-                  href={`/products/${product.id}`}
-                  className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-                >
-                  编辑
-                </Link>
-                <Button type="button" variant="destructive" size="sm" onClick={() => onDelete(product.id)}>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  删除
-                </Button>
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

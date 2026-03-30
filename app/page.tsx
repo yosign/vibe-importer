@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Boxes, CircleCheckBig, PackageSearch } from "lucide-react";
+import { Download, PackageSearch, Upload } from "lucide-react";
 import { CsvExportButton } from "@/components/CsvExportButton";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductTable, type ProductRow } from "@/components/ProductTable";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 type ProductsResponse = {
@@ -69,23 +67,32 @@ export default function ProductsPage() {
 
   const readyCount = products.filter((product) => product.status === "ready").length;
 
+  const tabs = [
+    { value: "all", label: "All" },
+    { value: "pending", label: "Pending" },
+    { value: "ready", label: "Ready" },
+    { value: "exported", label: "Exported" }
+  ] as const;
+
   return (
-    <main className="min-h-screen px-4 py-10 md:px-8">
-      <div className="mx-auto max-w-7xl space-y-8">
-        <div className="flex flex-col gap-4 rounded-[2rem] border border-white/60 bg-white/70 p-8 shadow-sm backdrop-blur md:flex-row md:items-center md:justify-between">
-          <div className="space-y-3">
-            <div className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-sm font-medium text-accent-foreground">
-              Shopify Import Workflow
-            </div>
-            <h1 className="text-4xl font-semibold tracking-tight">Vibe Importer</h1>
-            <p className="max-w-2xl text-muted-foreground">
-              解析本地商品目录，编辑结构化商品数据，并导出 Shopify CSV。
-            </p>
+    <main className="px-6 py-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        {/* Page header */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Products</h1>
+            <p className="mt-1 text-sm text-zinc-400">Manage and export your Shopify products</p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/import" className={cn(buttonVariants({ variant: "outline" }))}>
-              Go to Import
-              <ArrowRight className="ml-2 h-4 w-4" />
+          <div className="flex items-center gap-3">
+            <Link
+              href="/import"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+              )}
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Import Products
             </Link>
             <CsvExportButton
               productIds={selectedIds}
@@ -95,42 +102,49 @@ export default function ProductsPage() {
           </div>
         </div>
 
+        {/* Stats row */}
         <div className="grid gap-4 md:grid-cols-3">
-          <ProductCard label="All Products" value={products.length} detail="已入库商品总数" />
-          <ProductCard label="Ready" value={readyCount} detail="可导出到 Shopify 的商品" tone="secondary" />
-          <ProductCard label="Selected" value={selectedIds.length} detail="当前表格中已选中的商品" />
+          <ProductCard label="Total Products" value={products.length} />
+          <ProductCard label="Ready to Export" value={readyCount} accent />
+          <ProductCard label="Selected" value={selectedIds.length} />
         </div>
 
-        <Card className="border-white/70 bg-white/90 backdrop-blur">
-          <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Boxes className="h-5 w-5" />
-                Product List
-              </CardTitle>
-              <p className="mt-1 text-sm text-muted-foreground">
-                选择商品后可批量导出；未选择时默认导出全部 `ready` 状态商品。
-              </p>
+        {/* Product table card */}
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900">
+          {/* Toolbar */}
+          <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+            <h2 className="text-sm font-medium text-zinc-100">Product List</h2>
+            {/* Filter tabs */}
+            <div className="flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-950 p-1">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => setStatusFilter(tab.value)}
+                  className={cn(
+                    "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+                    statusFilter === tab.value
+                      ? "bg-zinc-700 text-zinc-100"
+                      : "text-zinc-500 hover:text-zinc-300"
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
-            <Tabs value={statusFilter} onValueChange={(value) => setStatusFilter(value as typeof statusFilter)}>
-              <TabsList>
-                <TabsTrigger value="all">全部</TabsTrigger>
-                <TabsTrigger value="pending">pending</TabsTrigger>
-                <TabsTrigger value="ready">ready</TabsTrigger>
-                <TabsTrigger value="exported">exported</TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </CardHeader>
-          <CardContent>
+          </div>
+
+          {/* Content */}
+          <div className="p-6">
             {loading ? (
-              <div className="flex items-center gap-3 rounded-2xl border border-dashed p-8 text-muted-foreground">
+              <div className="flex items-center gap-3 rounded-lg border border-dashed border-zinc-700 p-8 text-zinc-500">
                 <PackageSearch className="h-5 w-5" />
                 Loading products...
               </div>
             ) : filteredProducts.length === 0 ? (
-              <div className="flex items-center gap-3 rounded-2xl border border-dashed p-8 text-muted-foreground">
-                <CircleCheckBig className="h-5 w-5" />
-                No products found for current filter.
+              <div className="flex items-center gap-3 rounded-lg border border-dashed border-zinc-700 p-8 text-zinc-500">
+                <Download className="h-5 w-5" />
+                No products found for the current filter.
               </div>
             ) : (
               <ProductTable
@@ -140,8 +154,8 @@ export default function ProductsPage() {
                 onDelete={handleDelete}
               />
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </main>
   );

@@ -48,8 +48,18 @@ export function CsvExportButton({
     }
   }
 
+  const isDisabled = disabled || loading;
+
   return (
-    <Button onClick={handleExport} disabled={disabled || loading}>
+    <Button
+      onClick={handleExport}
+      disabled={isDisabled}
+      className={
+        isDisabled
+          ? "bg-zinc-800 text-zinc-600 hover:bg-zinc-800"
+          : "bg-emerald-600 text-white hover:bg-emerald-500"
+      }
+    >
       <Download className="mr-2 h-4 w-4" />
       {loading ? "Exporting..." : "Export CSV"}
     </Button>

@@ -2,10 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft, FolderOpen, Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 type FolderState = {
   name: string;
@@ -75,58 +74,90 @@ export default function ImportPage() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-10 md:px-8">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <Card className="border-white/70 bg-white/85 backdrop-blur">
-          <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <CardTitle className="text-3xl">Import Products</CardTitle>
-              <p className="mt-2 text-sm text-muted-foreground">
-                扫描 `workspace/imports/` 下的商品目录，并逐个解析写入 Supabase。
-              </p>
-            </div>
-            <Button onClick={handleScan} disabled={scanning}>
-              <RefreshCw className="mr-2 h-4 w-4" />
-              {scanning ? "Scanning..." : "Scan imports folder"}
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
+    <main className="px-6 py-8">
+      <div className="mx-auto max-w-3xl space-y-6">
+        {/* Page header */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">Import Products</h1>
+            <p className="mt-1 text-sm text-zinc-400">
+              Scan your imports folder and parse product folders into Supabase
+            </p>
+          </div>
+          <Button
+            onClick={handleScan}
+            disabled={scanning}
+            className="bg-emerald-600 text-white hover:bg-emerald-500"
+          >
             {scanning ? (
-              <div className="space-y-3">
-                <Skeleton className="h-16 w-full rounded-2xl" />
-                <Skeleton className="h-16 w-full rounded-2xl" />
-                <Skeleton className="h-16 w-full rounded-2xl" />
-              </div>
-            ) : folders.length === 0 ? (
-              <div className="rounded-2xl border border-dashed p-8 text-sm text-muted-foreground">
-                No scanned folders yet. Click &quot;Scan imports folder&quot; to start.
-              </div>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              folders.map((folder) => (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            {scanning ? "Scanning..." : "Scan Folder"}
+          </Button>
+        </div>
+
+        {/* Folder list */}
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900">
+          {scanning ? (
+            <div className="space-y-px p-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-16 animate-pulse rounded-lg bg-zinc-800" />
+              ))}
+            </div>
+          ) : folders.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-zinc-700 m-4 p-10 text-center text-sm text-zinc-500">
+              <FolderOpen className="h-8 w-8 text-zinc-600" />
+              <p>No folders found.</p>
+              <p className="text-xs">Add product folders to <code className="rounded bg-zinc-800 px-1 py-0.5 text-zinc-400">workspace/imports/</code></p>
+            </div>
+          ) : (
+            <div className="divide-y divide-zinc-800">
+              {folders.map((folder) => (
                 <div
                   key={folder.name}
-                  className="flex flex-col gap-3 rounded-2xl border bg-white/80 p-4 md:flex-row md:items-center md:justify-between"
+                  className="flex items-center justify-between px-6 py-4"
                 >
-                  <div>
-                    <p className="font-medium">{folder.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {folder.message ?? `Status: ${folder.status}`}
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-zinc-100">{folder.name}</p>
+                    <p
+                      className={cn(
+                        "mt-0.5 text-xs",
+                        folder.status === "success" && "text-emerald-400",
+                        folder.status === "error" && "text-red-400",
+                        folder.status === "idle" && "text-zinc-500",
+                        folder.status === "loading" && "text-zinc-400"
+                      )}
+                    >
+                      {folder.message ?? (folder.status === "idle" ? "Ready to parse" : folder.status)}
                     </p>
                   </div>
                   <Button
+                    size="sm"
                     variant={folder.status === "success" ? "secondary" : "default"}
                     onClick={() => handleParse(folder.name)}
                     disabled={folder.status === "loading"}
+                    className={cn(
+                      folder.status !== "success" && "bg-emerald-600 text-white hover:bg-emerald-500",
+                      folder.status === "success" && "bg-zinc-800 text-zinc-400"
+                    )}
                   >
+                    {folder.status === "loading" ? (
+                      <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                    ) : null}
                     {folder.status === "loading" ? "Parsing..." : "Parse"}
                   </Button>
                 </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
+              ))}
+            </div>
+          )}
+        </div>
 
-        <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm text-zinc-400 transition-colors hover:text-zinc-100"
+        >
           <ArrowLeft className="h-4 w-4" />
           Back to Products
         </Link>
